@@ -5,6 +5,20 @@
 #define DICT_CONTENT_SIZE 100000
 #define GUESS_SIZE 2
 
+typedef struct DictInfo{
+	int length;
+	char** wordsArr;
+} DictInfo;
+
+void playHangman(DictInfo* info){
+	//randomly selected word
+	printf("Randomly selecting word from dictionary \n");
+	printf("GODDIEEEEEE%s\n", info->wordsArr[0] );
+
+
+			//loop to prompt guesses and print appropriate output
+}
+
 int promptHangman(){
 	/*************************************************
 	Prompt user to play hangman
@@ -17,6 +31,8 @@ int promptHangman(){
 		//if yes
 		if(guess[0] == 'y'){
 			printf("You said yes!\n");
+			printf("************************************************\n");
+			printf("Playing HANGMAN\n\n");
 			return 1;
 		}
 		else{
@@ -24,13 +40,10 @@ int promptHangman(){
 			return 0;
 		}
 
-			//call playgame method with randomly selected word
-			//loop to prompt guesses and print appropriate output
-
 	//if no, exit
 }
 
-char** loadDictToStringArray(char* dictName) {
+DictInfo* loadDictToStringArray(char* dictName) {
 	/************************************************
 	Load dict file as string and split
 	************************************************/
@@ -82,11 +95,14 @@ char** loadDictToStringArray(char* dictName) {
 
 	/***********************************************/
 
+	DictInfo* info = malloc(sizeof(struct DictInfo));
+	info->length = i;
+	info->wordsArr = words; 
 
-	return words;
-
+	return info;
 
 }
+
 
 int main(int argc, char* argv[]){
 	if(argc < 2){
@@ -107,15 +123,16 @@ int main(int argc, char* argv[]){
 	char* dictName = malloc(sizeof(char)*strlen(argv[1]));
 	dictName = argv[1];
 	//printf("%s\n", dictName);
-	char** words; //IS THIS BAD??? should i be mallocing?
-	words = loadDictToStringArray(dictName);
+	//char** words; //IS THIS BAD??? should i be mallocing?
+	DictInfo* info;
+	info = loadDictToStringArray(dictName);
 
 
 
 	int play = 0;
 	play = promptHangman();
-	if(play = 1){
-		playHangman();
+	if(play == 1){
+		playHangman(info);
 	}
 	
 
