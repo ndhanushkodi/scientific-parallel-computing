@@ -18,7 +18,7 @@ typedef struct GameState{
 	int numMisses;
 	int winLose; //0 is continue, 1 is lose, 2 is win
 } GameState;
-
+int promptHangman(DictInfo*);
 
 GameState* updateState(char* gameWord, GameState* state, char* guess){
 
@@ -36,7 +36,8 @@ GameState* updateState(char* gameWord, GameState* state, char* guess){
 		}
 	}
 	if(hit == 0){
-		if(guess[0]) if misses doesnt contain guess, then do this
+		/*TODOif(guess[0]) if misses doesnt contain guess, then do this
+		*/
 		state->misses[state->numMisses] = guess[0];
 		state->numMisses++;
 	}
@@ -102,14 +103,15 @@ void playHangman(DictInfo* info){
 		//print state
 	}
 
-	if(state->winLose == 1)
+	if(state->winLose == 1){
 		printf("LOSERRRRRR\n");
-	if(state->winLose == 2)
+		promptHangman(info);
+	}
+	if(state->winLose == 2){
 		printf("WINNERRRRR\n");
+		promptHangman(info);
+	}
 
-
-
-			//loop to prompt guesses and print appropriate output
 }
 
 
@@ -117,7 +119,9 @@ int promptHangman(DictInfo* info){
 	/*************************************************
 	Prompt user to play hangman
 	**************************************************/
-	printf("Do you want to play HANGMAN? Enter y/n: ");
+	printf("_________________________________________________________\n");
+	printf("\nDo you want to play HANGMAN? Enter y/n: ");
+	
 	char* playYN = malloc(sizeof(char)*GUESS_SIZE);
 	scanf("%s", playYN);
 	// guess = "n";
@@ -173,7 +177,7 @@ DictInfo* loadDictToStringArray(char* dictName) {
 
 	//char* words[DICT_CONTENT_SIZE]; //this gives warning
 	char** words = malloc(sizeof(char*)*DICT_CONTENT_SIZE);
-	char* p = strtok(dictContent, "\t");
+	char* p = strtok(dictContent, "\t"); //use strlen on p
 	int i = 0;
 	
 	while(p != NULL){
@@ -228,8 +232,9 @@ int main(int argc, char* argv[]){
 	into memory. Then declare array of strings so the
 	call to loadDictToStringArray will put the words
 	in the string array*/
-	char* dictName = malloc(sizeof(char)*strlen(argv[1]));
-	dictName = argv[1]; //???DOES THIS PUT NULL TERM FOR me?
+	// char* dictName = malloc(sizeof(char)*strlen(argv[1]));
+	// dictName = argv[1]; //???DOES THIS PUT NULL TERM FOR me? no need
+	char* dictName = argv[1];
 	//printf("%s\n", dictName);
 	//char** words; //IS THIS BAD??? should i be mallocing?
 	DictInfo* info;
