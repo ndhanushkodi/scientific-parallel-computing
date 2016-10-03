@@ -20,15 +20,40 @@ typedef struct GameState{
 } GameState;
 
 
-GameState* updateState(GameState* state, char* guess){
-	printf("\nyour guess was %s\n", guess);
+GameState* updateState(char* gameWord, GameState* state, char* guess){
 
 	state->guess = guess;
+	int hit = 0; //0 is miss, 1 is hit
+	int starCount = 0; //if we have 0 stars at end, game state needs to be "win"
+	int i;
+	for(i=0; i<strlen(gameWord); i++){
+		if(gameWord[i] == guess[0]){
+			state->wordWithBlanks[i] = guess[0];
+			hit = 1;
+		}
+		if(state->wordWithBlanks[i] == '*'){
+			starCount++;
+		}
+	}
+	if(hit == 0){
+		if(guess[0]) if misses doesnt contain guess, then do this
+		state->misses[state->numMisses] = guess[0];
+		state->numMisses++;
+	}
+	
+	if(starCount == 0){
+		state->winLose = 2; //got the word, win state
+	}
+	if(state->numMisses>15){
+		state->winLose = 1; //lost the game, losing state
+	}
 
 
 
-	printf("*******FINALSTATE*******\n");
+	printf("*******DEBUGSTATE*******\n");
+	//printf("DEBUGGameword: %s\n", gameWord);
 	printf("Word: %s\n", state-> wordWithBlanks);
+	printf("Starcount: %i\n", starCount);
 	printf("Guess: %s\n", state-> guess);
 	printf("Misses: %s\n", state-> misses);
 	printf("Num Misses: %i\n", state-> numMisses);
@@ -41,12 +66,13 @@ GameState* updateState(GameState* state, char* guess){
 void playHangman(DictInfo* info){
 	/*Randomly select a word from dictionary*/
 	printf("Randomly selecting word from dictionary...\n");
-	printf("GOTTIEEEEEE%s\n", info->wordsArr[0] );
-	printf("GOTTIEEEEEE%i\n", info->length );
+	// printf("GOTTIEEEEEE%s\n", info->wordsArr[0] );
+	// printf("GOTTIEEEEEE%i\n", info->length );
 	int randIndex = rand()%info->length;
+	char* gameWord = info->wordsArr[randIndex];
 	int wordLen = strlen(info->wordsArr[randIndex]);
-	printf("Chose a (%i) letter word\n", wordLen);
-	printf("DEBUG: word was %s\n", info->wordsArr[randIndex]);
+	printf("\n\nYour word is (%i) letters long!\n", wordLen);
+	//printf("DEBUG: word was %s\n", info->wordsArr[randIndex]);
 	
 	/*Set up initial game state*/
 	GameState* state = malloc(sizeof(struct GameState));
@@ -58,7 +84,7 @@ void playHangman(DictInfo* info){
 		state->wordWithBlanks[i] = '*';
 	}
 	printf("%s", state->wordWithBlanks);
-	printf("%i\n", (int) strlen(state->wordWithBlanks));
+	//printf("DEBUG LENGTH%i\n", (int) strlen(state->wordWithBlanks));
 	state->guess = calloc(GUESS_SIZE, sizeof(char));
 	state->misses = calloc(ALPHA_SIZE, sizeof(char));
 	state->numMisses = 0;
@@ -72,9 +98,14 @@ void playHangman(DictInfo* info){
 		
 
 		//update state based on state->guess
-		state = updateState(state, guess);
+		state = updateState(gameWord, state, guess);
 		//print state
 	}
+
+	if(state->winLose == 1)
+		printf("LOSERRRRRR\n");
+	if(state->winLose == 2)
+		printf("WINNERRRRR\n");
 
 
 
@@ -94,8 +125,8 @@ int promptHangman(DictInfo* info){
 		//if yes
 		if(playYN[0] == 'y'){
 			printf("You said yes!\n\n\n");
-			printf("************************************************\n");
-			printf("Playing HANGMAN\n\n");
+			printf("_________________________________________________________\n");
+			printf("\nPlaying HANGMAN\n\n");
 			playHangman(info);
 			return 1;
 		}
@@ -121,7 +152,7 @@ DictInfo* loadDictToStringArray(char* dictName) {
 		printf("\nDictionary file not found. Quitting hangman.\n");
 		//throw error
 	}
-	printf("\nReading dictionary words from %s\n", dictName);
+	printf("\n\n\n\n\nReading dictionary words from %s\n", dictName);
 
 	/*fgets takes 3 args
 	1- pointer to buffer where contents of string go (a char*)
@@ -211,7 +242,10 @@ int main(int argc, char* argv[]){
 	// if(play == 1){
 	// 	playHangman(info);
 	// }
-	free(dictName);
+	/*****************************************************
+	??? THIS IS CORE DUMPING??????????????????????
+	*****************************************************/
+	//free(dictName);
 
 	return 0;
 }
