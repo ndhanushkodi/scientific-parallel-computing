@@ -18,7 +18,7 @@ typedef struct GameState{
 	int numMisses;
 	int winLose; //0 is continue, 1 is lose, 2 is win
 } GameState;
-int promptHangman(DictInfo*);
+int promptHangman(DictInfo*, GameState*);
 
 GameState* updateState(char* gameWord, GameState* state, char* guess){
 
@@ -64,7 +64,7 @@ GameState* updateState(char* gameWord, GameState* state, char* guess){
 	return state;
 }
 
-void playHangman(DictInfo* info){
+void playHangman(DictInfo* info, GameState* state){
 	/*Randomly select a word from dictionary*/
 	printf("Randomly selecting word from dictionary...\n");
 	// printf("GOTTIEEEEEE%s\n", info->wordsArr[0] );
@@ -76,7 +76,7 @@ void playHangman(DictInfo* info){
 	//printf("DEBUG: word was %s\n", info->wordsArr[randIndex]);
 	
 	/*Set up initial game state*/
-	GameState* state = malloc(sizeof(struct GameState));
+	
 	state->wordWithBlanks = calloc(wordLen+1, sizeof(char)); //
 	state->wordWithBlanks[wordLen] = '\0';
 	
@@ -105,17 +105,21 @@ void playHangman(DictInfo* info){
 
 	if(state->winLose == 1){
 		printf("LOSERRRRRR\n");
-		promptHangman(info);
+		promptHangman(info, state);
 	}
 	if(state->winLose == 2){
 		printf("WINNERRRRR\n");
-		promptHangman(info);
+		promptHangman(info, state);
 	}
+
+	free(state->wordWithBlanks);
+	free(state->guess);
+	free(state->misses);
 
 }
 
 
-int promptHangman(DictInfo* info){
+int promptHangman(DictInfo* info, GameState* state){
 	/*************************************************
 	Prompt user to play hangman
 	**************************************************/
@@ -131,18 +135,20 @@ int promptHangman(DictInfo* info){
 			printf("You said yes!\n\n\n");
 			printf("_________________________________________________________\n");
 			printf("\nPlaying HANGMAN\n\n");
-			playHangman(info);
+			playHangman(info, state);
+			free(playYN);
 			return 1;
 		}
 		else{
 			printf("You didn't want to play :(. Quitting...\n");
+			free(playYN);
 			return 0;
 		}
 
 	//if no, exit
 }
 
-DictInfo* loadDictToStringArray(char* dictName) {
+DictInfo* loadDictToStringArray(char* dictName, DictInfo* info) {
 	/************************************************
 	Load dict file as string and split
 	************************************************/
@@ -204,7 +210,7 @@ DictInfo* loadDictToStringArray(char* dictName) {
 	/***********************************************/
 
 
-	DictInfo* info = malloc(sizeof(struct DictInfo));
+	
 	info->length = i;
 	info->wordsArr = words; 
 
@@ -237,10 +243,11 @@ int main(int argc, char* argv[]){
 	char* dictName = argv[1];
 	//printf("%s\n", dictName);
 	//char** words; //IS THIS BAD??? should i be mallocing?
-	DictInfo* info;
-	info = loadDictToStringArray(dictName);
+	DictInfo* info = malloc(sizeof(struct DictInfo));
+	info = loadDictToStringArray(dictName, info);
 
-	promptHangman(info);
+	GameState* state = malloc(sizeof(struct GameState));
+	promptHangman(info, state);
 
 	// int play = 0;
 	// play = promptHangman();
@@ -251,6 +258,9 @@ int main(int argc, char* argv[]){
 	??? THIS IS CORE DUMPING??????????????????????
 	*****************************************************/
 	//free(dictName);
+	free(info->wordsArr);
+	free(info);
+	free(state);
 
 	return 0;
 }
