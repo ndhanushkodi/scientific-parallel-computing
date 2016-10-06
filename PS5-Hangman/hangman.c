@@ -23,7 +23,118 @@ typedef struct GameState{
 	int numMisses;
 	int winLose; //0 is continue, 1 is lose, 2 is win
 } GameState;
-int promptHangman(DictInfo*, GameState*);
+
+
+/*Print out the Word, current guess, misses, the number of misses
+so far, and the gallows*/
+void printState(GameState* state){
+	
+	//printf("DEBUGGameword: %s\n", gameWord);
+	printf("Word: %s\n", state-> wordWithBlanks);
+	
+	printf("Guess: %s\n", state-> guess);
+	printf("Misses: %s\n", state-> misses);
+
+	printf("Number of misses so Far: %i\n\n", state-> numMisses);
+	switch(state->numMisses){
+		case 0:
+		break;
+
+		case 1:
+		printf("   |\n");
+		printf("  _|___\n");
+		break;
+
+		case 2:
+		printf("____________\n");
+		printf("   |/\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("  _|___\n");
+		break;
+
+		case 3:
+		printf("____________\n");
+		printf("   |/      |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("  _|___\n");
+		break;
+
+		case 4:
+		printf("____________\n");
+		printf("   |/      |\n");
+		printf("   |      (_)\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("  _|___\n");
+		break;
+
+		case 5:
+		printf("____________\n");
+		printf("   |/      |\n");
+		printf("   |      (_)\n");
+		printf("   |       |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("  _|___\n");
+		break;
+
+		case 6:
+		printf("____________\n");
+		printf("   |/      |\n");
+		printf("   |      (_)\n");
+		printf("   |      \\|/\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("  _|___\n");
+		break;
+
+		case 7:
+		printf("____________\n");
+		printf("   |/      |\n");
+		printf("   |      (_)\n");
+		printf("   |      \\|/\n");
+		printf("   |       |\n");
+		printf("   |\n");
+		printf("   |\n");
+		printf("  _|___\n");
+		break;
+
+		case 8:
+		printf("____________\n");
+		printf("   |/      |\n");
+		printf("   |      (_)\n");
+		printf("   |      \\|/\n");
+		printf("   |       |\n");
+		printf("   |      /\n");
+		printf("   |\n");
+		printf("  _|___\n");
+		break;
+
+		case 9:
+		printf("____________\n");
+		printf("   |/      |\n");
+		printf("   |      (_)\n");
+		printf("   |      \\|/\n");
+		printf("   |       |\n");
+		printf("   |      / \\\n");
+		printf("   |\n");
+		printf("  _|___\n");
+		break;
+
+	}
+}
 
 GameState* updateState(char* gameWord, GameState* state, char* guess){
 
@@ -50,7 +161,7 @@ GameState* updateState(char* gameWord, GameState* state, char* guess){
 	if(starCount == 0){
 		state->winLose = 2; //got the word, win state
 	}
-	if(state->numMisses>15){
+	if(state->numMisses>8){
 		state->winLose = 1; //lost the game, losing state
 	}
 
@@ -60,17 +171,6 @@ GameState* updateState(char* gameWord, GameState* state, char* guess){
 
 
 	return state;
-}
-
-void printState(GameState* state){
-	
-	//printf("DEBUGGameword: %s\n", gameWord);
-	printf("Word: %s\n", state-> wordWithBlanks);
-	
-	printf("Guess: %s\n", state-> guess);
-	printf("Misses: %s\n", state-> misses);
-	printf("Num Misses: %i\n", state-> numMisses);
-	printf("ContinueWinLose: %i\n", state-> winLose);
 }
 
 void playHangman(DictInfo* info, GameState* state){
@@ -105,9 +205,8 @@ void playHangman(DictInfo* info, GameState* state){
 		/*Prompt guess*/
 		printf("\n\nGuess a letter: ");
 		scanf("%s", guess);
-		
 
-		//update state based on state->guess
+		/*update state based on guess*/
 		state = updateState(gameWord, state, guess);
 		//print state
 		printState(state);
@@ -118,48 +217,42 @@ void playHangman(DictInfo* info, GameState* state){
 	free(state->misses);
 
 	if(state->winLose == 1){
-		printf("LOSERRRRRR\n");
-		promptHangman(info, state);
+		printf("\n\nYOU LOST!!\n");
+		//promptHangman(info, state);
 	}
 	if(state->winLose == 2){
-		printf("WINNERRRRR\n");
-		promptHangman(info, state);
+		printf("\n\nYOU WON!\n");
+		//promptHangman(info, state);
 	}
-
-	
-
 }
 
-
-int promptHangman(DictInfo* info, GameState* state){
+/*Returns 1 if the user wants to play hangman
+Returns 0 if the user doesn't want to play hangman*/
+int promptHangman(){
 	/*************************************************
 	Prompt user to play hangman
 	**************************************************/
 	printf("_________________________________________________________\n");
 	printf("\nDo you want to play HANGMAN? Enter y/n: ");
 	
+	/*Make space for the user's one character input*/
 	char* playYN = malloc(sizeof(char)*GUESS_SIZE);
 	scanf("%s", playYN);
-	// guess = "n";
-	// printf("%s\n", guess);
-		//if yes
+
+		//if user says yes
 		if(playYN[0] == 'y'){
 			free(playYN);
 			printf("You said yes!\n\n\n");
 			printf("_________________________________________________________\n");
 			printf("\nPlaying HANGMAN\n\n");
-			playHangman(info, state);
-			
 			return 1;
 		}
+
 		else{
 			free(playYN);
 			printf("You didn't want to play :(. Quitting...\n");
-			
 			return 0;
 		}
-
-	//if no, exit
 }
 
 
@@ -167,15 +260,16 @@ int promptHangman(DictInfo* info, GameState* state){
 http://stackoverflow.com/questions/7374062/how-do-i-count-the-number-of-words-in-a-text-file-using-c
 and tried to make sure I understood each line of code that I used from it.*/
 Counts* wordCount(FILE* fileptr, Counts* cts){
+	//initialize contents of Counts* struct pointer
 	cts->wordCount = 0;
 	cts->charCount = 0;
 
 	char c;
 	c = fgetc(fileptr);
-	while(c != EOF){
-		cts->charCount++;
+	while(c != EOF){ //walk through every char
+		cts->charCount++; //increment char counter
 		if(c == '\t')
-			cts->wordCount++;
+			cts->wordCount++; //when we see a tab delimeter, increment word count
 		c = fgetc(fileptr);
 	}
 	fclose(fileptr);
@@ -183,6 +277,8 @@ Counts* wordCount(FILE* fileptr, Counts* cts){
 	return cts; 
 }
 
+/*Takes in a filename, and returns a read only
+file pointer to the beginning of the file.*/
 FILE* getReadFilePointer(char* fileName){
 	/*file pointer variable marks place in the file*/
 	FILE* fileptr; 
@@ -196,44 +292,49 @@ FILE* getReadFilePointer(char* fileName){
 	return fileptr;
 }
 
+/*Returns a DictInfo* with length of the dictionary in number of words
+and all of the words in a string array.*/
 DictInfo* loadDictToStringArray(char* dictName, DictInfo* info) {
 	/************************************************
 	Load dict file as string and split
 	************************************************/
 	printf("\n\n\n\n\nReading dictionary words from %s\n", dictName);
 
-
+	//store word and character counts in Counts* struct pointer
+	/*NOTE: my hangman would word if I actually used
+	counts->charCount for the char* dictContent and counts->wordCount
+	for the char**words, but it would core dump after a few games.
+	So, I ended up leaving it to use DICT_CONTENT_SIZE*/
 	FILE* f = getReadFilePointer(dictName);
 	Counts* counts = malloc(sizeof(struct Counts));
 	counts = wordCount(f, counts);
-	printf("*****WORDCOUNT RETURNED %i words********\n", counts->wordCount);
-	printf("*****CHARCOUNT RETURNED %i words********\n", counts->charCount);
+
 
 	/*fgets takes 3 args
 	1- pointer to buffer where contents of string go (a char*)
 	2- max size of contents stored at address of arg 1
 	3- where to read from*/
-	//char dictContent[DICT_CONTENT_SIZE];
 	FILE* fileptr = getReadFilePointer(dictName);
 	char* dictContent = malloc(sizeof(char)*DICT_CONTENT_SIZE); //??????????????? doesnt work char*
 	fgets(dictContent, DICT_CONTENT_SIZE, fileptr);
 
 	fclose(fileptr);
 
-	// printf("Dictionary contents \n %s", dictContent);
+	// printf("DEBUG: Dictionary contents \n %s", dictContent);
 
 
 	/*************************************************
 	Load dict file strings into memory in string array
 	**************************************************/
-
-	//char* words[DICT_CONTENT_SIZE]; //this gives warning
-	char** words = malloc(sizeof(char*)*DICT_CONTENT_SIZE);
-	char* p = strtok(dictContent, "\t"); //use strlen on p
+	/*Unfortunately had to us DICT_CONTENT_SIZE as described in the
+	 note above.*/
+	char** words = malloc(sizeof(char*)*DICT_CONTENT_SIZE); 
+	/*get pointer to first word*/
+	char* p = strtok(dictContent, "\t"); //use strlen on p to see that null terminator is taken care of
 	int i = 0;
 	
-	while(p != NULL){
-		words[i++] = p;
+	while(p != NULL){ //continue getting pointers to words
+		words[i++] = p; //store the words
 		p = strtok(NULL, "\t");
 	}
 
@@ -251,21 +352,16 @@ DictInfo* loadDictToStringArray(char* dictName, DictInfo* info) {
 
 
 	printf("Your dictionary contains (%i) words!\n", i);
-
-
-	/***********************************************/
-
-
 	
 	info->length = i;
 	info->wordsArr = words; 
 
-	printf("HEY 2%s\n", info->wordsArr[0]);
-	printf("HEY 2%s\n", info->wordsArr[1]);
-	printf("HEY 2%s\n", info->wordsArr[2]);
-	 printf("HEY 2%s\n", info->wordsArr[3]);
-	 printf("HEY 2%i\n", info->wordsArr[3][6]);
-	 printf("HEY 2%i\n", (int) strlen(info->wordsArr[3]));
+	// printf("DEBUGHEY 2%s\n", info->wordsArr[0]);
+	// printf("DEBUGHEY 2%s\n", info->wordsArr[1]);
+	// printf("DEBUGHEY 2%s\n", info->wordsArr[2]);
+	//  printf("DEBUGHEY 2%s\n", info->wordsArr[3]);
+	//  printf("DEBUG HEY 2%i\n", info->wordsArr[3][6]);
+	//  printf("DEBUG HEY 2%i\n", (int) strlen(info->wordsArr[3]));
 
 	free(dictContent);
 	free(counts);
@@ -289,55 +385,35 @@ int main(int argc, char* argv[]){
 	srand(time(NULL));
 
 	/*Make space for and load the dictionary filename
-	into memory. Then declare array of strings so the
-	call to loadDictToStringArray will put the words
-	in the string array*/
-	// char* dictName = malloc(sizeof(char)*strlen(argv[1]));
-	// dictName = argv[1]; //???DOES THIS PUT NULL TERM FOR me? no need
+	into memory.*/
 	char* dictName = argv[1];
-	//printf("%s\n", dictName);
-	//char** words; //IS THIS BAD??? should i be mallocing?
+
+	/*Then declare info struct and make space for it. 
+	It will contain number of words in the dictionary and 
+	the array of words. */
 	DictInfo* info = malloc(sizeof(struct DictInfo));
-	
+	/*call the method that will take the text file and put it
+	into "info" format*/
 	info = loadDictToStringArray(dictName, info);
 
+	/*state will hold important game state info that will
+	be altered during each guess in hangman*/
 	GameState* state = malloc(sizeof(struct GameState));
-	promptHangman(info, state);
+	/*prompt user to play hangman*/
+	int play = promptHangman();
 
-	// int play = 0;
-	// play = promptHangman();
-	// if(play == 1){
-	// 	playHangman(info);
-	// }
+	/*After every game we prompt the user to play hangman,
+	and we keep going until the user says no*/
+	while(play == 1){ 
+		playHangman(info, state);
+		play = promptHangman();
+	}
 
+	/*Free things inside info and state at the end of the program*/
 	free(info->wordsArr);
 	free(info);
 	free(state);
+	
 
 	return 0;
 }
-
-
-	// _ _ _ _ 
-	// |      |
-	// |      0
-	// |	  /|\\
-	// |     / \\
-	// |
-	// |_ _ _ _
-
-
-  // ____________
-  //    |/      |
-  //    |      (_)
-  //    |      \|/
-  //    |       |
-  //    |      / \
-  //    |
-  //   _|___
-
-
-
-
-
-
