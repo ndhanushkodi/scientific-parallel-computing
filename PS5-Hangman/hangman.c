@@ -11,6 +11,11 @@ typedef struct DictInfo{
 	char** wordsArr;
 } DictInfo;
 
+typedef struct Counts{
+	int charCount;
+	int wordCount;
+} Counts;
+
 typedef struct GameState{
 	char* wordWithBlanks;
 	char* guess;
@@ -50,18 +55,22 @@ GameState* updateState(char* gameWord, GameState* state, char* guess){
 	}
 
 
+	printf("_____________________________________________\n");
+	printf("Starcount: %i\n", starCount);
 
-	printf("*******DEBUGSTATE*******\n");
+
+	return state;
+}
+
+void printState(GameState* state){
+	
 	//printf("DEBUGGameword: %s\n", gameWord);
 	printf("Word: %s\n", state-> wordWithBlanks);
-	printf("Starcount: %i\n", starCount);
+	
 	printf("Guess: %s\n", state-> guess);
 	printf("Misses: %s\n", state-> misses);
 	printf("Num Misses: %i\n", state-> numMisses);
 	printf("ContinueWinLose: %i\n", state-> winLose);
-
-
-	return state;
 }
 
 void playHangman(DictInfo* info, GameState* state){
@@ -101,6 +110,7 @@ void playHangman(DictInfo* info, GameState* state){
 		//update state based on state->guess
 		state = updateState(gameWord, state, guess);
 		//print state
+		printState(state);
 	}
 
 	if(state->winLose == 1){
@@ -148,27 +158,59 @@ int promptHangman(DictInfo* info, GameState* state){
 	//if no, exit
 }
 
-DictInfo* loadDictToStringArray(char* dictName, DictInfo* info) {
-	/************************************************
-	Load dict file as string and split
-	************************************************/
 
+/*I referenced this stackoverflow
+http://stackoverflow.com/questions/7374062/how-do-i-count-the-number-of-words-in-a-text-file-using-c
+and tried to make sure I understood each line of code that I used from it.*/
+Counts* wordCount(FILE* fileptr, Counts* cts){
+	cts->wordCount = 0;
+	cts->charCount = 0;
+
+	char c;
+	c = fgetc(fileptr);
+	while(c != EOF){
+		cts->charCount++;
+		if(c == '\t')
+			cts->wordCount++;
+		c = fgetc(fileptr);
+	}
+	fclose(fileptr);
+	cts->wordCount = cts->wordCount+1; //to account for the last word, which doesn't have a tab after it
+	return cts; 
+}
+
+FILE* getReadFilePointer(char* fileName){
 	/*file pointer variable marks place in the file*/
 	FILE* fileptr; 
 	/*open dictionary file with read access*/
-	fileptr = fopen(dictName, "r");
+	fileptr = fopen(fileName, "r");
 	/*check that file pointer actually points to file*/
 	if(fileptr == NULL){
 		printf("\nDictionary file not found. Quitting hangman.\n");
 		//throw error
 	}
+	return fileptr;
+}
+
+DictInfo* loadDictToStringArray(char* dictName, DictInfo* info) {
+	/************************************************
+	Load dict file as string and split
+	************************************************/
 	printf("\n\n\n\n\nReading dictionary words from %s\n", dictName);
+
+
+	FILE* f = getReadFilePointer(dictName);
+	Counts* counts = malloc(sizeof(struct Counts));
+	counts = wordCount(f, counts);
+	printf("*****WORDCOUNT RETURNED %i words********\n", counts->wordCount);
+	printf("*****CHARCOUNT RETURNED %i words********\n", counts->charCount);
 
 	/*fgets takes 3 args
 	1- pointer to buffer where contents of string go (a char*)
 	2- max size of contents stored at address of arg 1
 	3- where to read from*/
 	//char dictContent[DICT_CONTENT_SIZE];
+	FILE* fileptr = getReadFilePointer(dictName);
 	char* dictContent = malloc(sizeof(char)*DICT_CONTENT_SIZE); //??????????????? doesnt work char*
 	fgets(dictContent, DICT_CONTENT_SIZE, fileptr);
 
@@ -215,6 +257,7 @@ DictInfo* loadDictToStringArray(char* dictName, DictInfo* info) {
 	info->wordsArr = words; 
 
 	free(dictContent);
+	free(counts);
 
 
 	return info;
@@ -244,6 +287,7 @@ int main(int argc, char* argv[]){
 	//printf("%s\n", dictName);
 	//char** words; //IS THIS BAD??? should i be mallocing?
 	DictInfo* info = malloc(sizeof(struct DictInfo));
+	
 	info = loadDictToStringArray(dictName, info);
 
 	GameState* state = malloc(sizeof(struct GameState));
@@ -254,10 +298,7 @@ int main(int argc, char* argv[]){
 	// if(play == 1){
 	// 	playHangman(info);
 	// }
-	/*****************************************************
-	??? THIS IS CORE DUMPING??????????????????????
-	*****************************************************/
-	//free(dictName);
+
 	free(info->wordsArr);
 	free(info);
 	free(state);
