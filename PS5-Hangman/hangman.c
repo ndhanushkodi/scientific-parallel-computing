@@ -113,6 +113,10 @@ void playHangman(DictInfo* info, GameState* state){
 		printState(state);
 	}
 
+	free(state->wordWithBlanks);
+	free(state->guess);
+	free(state->misses);
+
 	if(state->winLose == 1){
 		printf("LOSERRRRRR\n");
 		promptHangman(info, state);
@@ -122,9 +126,7 @@ void playHangman(DictInfo* info, GameState* state){
 		promptHangman(info, state);
 	}
 
-	free(state->wordWithBlanks);
-	free(state->guess);
-	free(state->misses);
+	
 
 }
 
@@ -142,16 +144,18 @@ int promptHangman(DictInfo* info, GameState* state){
 	// printf("%s\n", guess);
 		//if yes
 		if(playYN[0] == 'y'){
+			free(playYN);
 			printf("You said yes!\n\n\n");
 			printf("_________________________________________________________\n");
 			printf("\nPlaying HANGMAN\n\n");
 			playHangman(info, state);
-			free(playYN);
+			
 			return 1;
 		}
 		else{
-			printf("You didn't want to play :(. Quitting...\n");
 			free(playYN);
+			printf("You didn't want to play :(. Quitting...\n");
+			
 			return 0;
 		}
 
@@ -255,6 +259,13 @@ DictInfo* loadDictToStringArray(char* dictName, DictInfo* info) {
 	
 	info->length = i;
 	info->wordsArr = words; 
+
+	printf("HEY 2%s\n", info->wordsArr[0]);
+	printf("HEY 2%s\n", info->wordsArr[1]);
+	printf("HEY 2%s\n", info->wordsArr[2]);
+	 printf("HEY 2%s\n", info->wordsArr[3]);
+	 printf("HEY 2%i\n", info->wordsArr[3][6]);
+	 printf("HEY 2%i\n", (int) strlen(info->wordsArr[3]));
 
 	free(dictContent);
 	free(counts);
