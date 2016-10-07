@@ -6,21 +6,24 @@
 #define GUESS_SIZE 3 //plus buffer space
 #define ALPHA_SIZE 100 //so commas plus all lowercase letters
 
-typedef struct DictInfo{
-	int length;
-	char** wordsArr;
+/*****************************************
+STRUCT DECLARATIONS
+******************************************/
+typedef struct DictInfo{ 
+	int length; //number of words
+	char** wordsArr; //array of words in dictionary
 } DictInfo;
 
-typedef struct Counts{
-	int charCount;
+typedef struct Counts{ //keep track of counts in dictionary file
+	int charCount; 
 	int wordCount;
 } Counts;
 
 typedef struct GameState{
-	char* wordWithBlanks;
-	char* guess;
-	char* misses;
-	int numMisses;
+	char* wordWithBlanks; //stores the word as stars, adds in the letters like **k*
+	char* guess; //the user's guess
+	char* misses; //list of misses
+	int numMisses; //total number of misses so far
 	int winLose; //0 is continue, 1 is lose, 2 is win
 } GameState;
 
@@ -28,14 +31,17 @@ typedef struct GameState{
 /*Print out the Word, current guess, misses, the number of misses
 so far, and the gallows*/
 void printState(GameState* state){
+
+	printf("_____________________________________________\n\n");
 	
-	//printf("DEBUGGameword: %s\n", gameWord);
+	/*Print out text state*/
 	printf("Word: %s\n", state-> wordWithBlanks);
-	
 	printf("Guess: %s\n", state-> guess);
 	printf("Misses: %s\n", state-> misses);
-
 	printf("Number of misses so Far: %i\n\n", state-> numMisses);
+
+	/*Depending on the number of misses so far,
+	draw the gallows.*/
 	switch(state->numMisses){
 		case 0:
 		break;
@@ -134,15 +140,21 @@ void printState(GameState* state){
 		break;
 
 	}
+	printf("_____________________________________________\n\n");
 }
 
 GameState* updateState(char* gameWord, GameState* state, char* guess){
 
-	state->guess = guess;
+	state->guess = guess; //update the guess
 	int hit = 0; //0 is miss, 1 is hit
 	int starCount = 0; //if we have 0 stars at end, game state needs to be "win"
 	int i;
-	for(i=0; i<strlen(gameWord); i++){
+
+	/*Go through the real word and the "in progress" word, and 
+	fill in the letters based on the guess. Record whether the 
+	guess was a hit or miss, and how many blanks (stars) are
+	left in the word.*/
+	for(i=0; i<strlen(gameWord); i++){ 
 		if(gameWord[i] == guess[0]){
 			state->wordWithBlanks[i] = guess[0];
 			hit = 1;
@@ -151,9 +163,7 @@ GameState* updateState(char* gameWord, GameState* state, char* guess){
 			starCount++;
 		}
 	}
-	if(hit == 0){
-		/*TODOif(guess[0]) if misses doesnt contain guess, then do this
-		*/
+	if(hit == 0){ //this is a miss, update state accordingly.
 		state->misses[state->numMisses] = guess[0];
 		state->numMisses++;
 	}
@@ -165,50 +175,52 @@ GameState* updateState(char* gameWord, GameState* state, char* guess){
 		state->winLose = 1; //lost the game, losing state
 	}
 
-
-	printf("_____________________________________________\n");
-	printf("Starcount: %i\n", starCount);
-
-
 	return state;
 }
 
+/*Initializes game state and has main loop where
+guesses are prompted and game state is updated and
+printed*/
 void playHangman(DictInfo* info, GameState* state){
+
 	/*Randomly select a word from dictionary*/
 	printf("Randomly selecting word from dictionary...\n");
-	// printf("GOTTIEEEEEE%s\n", info->wordsArr[0] );
-	// printf("GOTTIEEEEEE%i\n", info->length );
 	int randIndex = rand()%info->length;
 	char* gameWord = info->wordsArr[randIndex];
 	int wordLen = strlen(info->wordsArr[randIndex]);
 	printf("\n\nYour word is (%i) letters long!\n", wordLen);
+
 	//printf("DEBUG: word was %s\n", info->wordsArr[randIndex]);
 	
-	/*Set up initial game state*/
-	
-	state->wordWithBlanks = calloc(wordLen+1, sizeof(char)); //
+	/************************************************
+	Set up initial game state
+	*************************************************/
+	state->wordWithBlanks = calloc(wordLen+1, sizeof(char)); 
 	state->wordWithBlanks[wordLen] = '\0';
-	
+	//make the wordWithBlanks all stars
 	int i;
 	for(i=0;i<wordLen;i++){
 		state->wordWithBlanks[i] = '*';
 	}
-	printf("%s", state->wordWithBlanks);
-	//printf("DEBUG LENGTH%i\n", (int) strlen(state->wordWithBlanks));
+	printf("%s\n", state->wordWithBlanks );
 	state->guess = calloc(GUESS_SIZE, sizeof(char));
 	state->misses = calloc(ALPHA_SIZE, sizeof(char));
 	state->numMisses = 0;
 	state->winLose = 0;
 
+	//variable to store guess
 	char* guess = malloc(sizeof(char)*GUESS_SIZE);
+
+	//loop to play game
 	while(state->winLose == 0){
 		/*Prompt guess*/
 		printf("\n\nGuess a letter: ");
 		scanf("%s", guess);
 
-		/*update state based on guess*/
+		/*Update state based on guess*/
 		state = updateState(gameWord, state, guess);
-		//print state
+
+		/*Print the gallows based on state*/
 		printState(state);
 	}
 
@@ -218,11 +230,9 @@ void playHangman(DictInfo* info, GameState* state){
 
 	if(state->winLose == 1){
 		printf("\n\nYOU LOST!!\n");
-		//promptHangman(info, state);
 	}
 	if(state->winLose == 2){
 		printf("\n\nYOU WON!\n");
-		//promptHangman(info, state);
 	}
 }
 
@@ -301,10 +311,13 @@ DictInfo* loadDictToStringArray(char* dictName, DictInfo* info) {
 	printf("\n\n\n\n\nReading dictionary words from %s\n", dictName);
 
 	//store word and character counts in Counts* struct pointer
-	/*NOTE: my hangman would word if I actually used
+	/*NOTE: my hangman would work if I actually used
 	counts->charCount for the char* dictContent and counts->wordCount
 	for the char**words, but it would core dump after a few games.
-	So, I ended up leaving it to use DICT_CONTENT_SIZE*/
+	(I may have a memory leak somewhere). I tried to use valgrind to find
+	the leak but unfortunately to no avail. :(
+	So, I ended up leaving it to use DICT_CONTENT_SIZE, but I have
+	the logic to count the chars &number of words in methods above.*/
 	FILE* f = getReadFilePointer(dictName);
 	Counts* counts = malloc(sizeof(struct Counts));
 	counts = wordCount(f, counts);
@@ -343,29 +356,17 @@ DictInfo* loadDictToStringArray(char* dictName, DictInfo* info) {
 	int lastWordLen = strlen(words[i-1]);
 	words[i-1][lastWordLen-1] = 0;
 	
-	// printf("HEY %s\n", words[0]);
-	// printf("HEY %s\n", words[1]);
-	// printf("HEY %s\n", words[2]);
-	 // printf("HEY %s\n", words[3]);
-	 // printf("HEY %i\n", words[3][6]);
-	 // printf("HEY %i\n", (int) strlen(words[3]));
-
 
 	printf("Your dictionary contains (%i) words!\n", i);
 	
+	//setting the number of words in the dictionary
+	//and the word array into the info struct
 	info->length = i;
 	info->wordsArr = words; 
 
-	// printf("DEBUGHEY 2%s\n", info->wordsArr[0]);
-	// printf("DEBUGHEY 2%s\n", info->wordsArr[1]);
-	// printf("DEBUGHEY 2%s\n", info->wordsArr[2]);
-	//  printf("DEBUGHEY 2%s\n", info->wordsArr[3]);
-	//  printf("DEBUG HEY 2%i\n", info->wordsArr[3][6]);
-	//  printf("DEBUG HEY 2%i\n", (int) strlen(info->wordsArr[3]));
 
 	free(dictContent);
 	free(counts);
-
 
 	return info;
 
