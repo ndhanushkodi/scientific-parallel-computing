@@ -39,9 +39,9 @@ int main(int argc, char* argv[]){
 	/*
 		Initialize n, m, and p to same number
 	*/
-	n = 10000;
-	m = 10000;
-	p = 10000;
+	n = 10;
+	m = 10;
+	p = 10;
 
 	//chunksize is the rows of A and C each process is computing from
 	int chunksize = m/(numprocs-1);
