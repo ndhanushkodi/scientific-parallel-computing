@@ -1,0 +1,32 @@
+1. Partitioning - decomposing into fine-grain tasks
+------------------------------------------------------
+Each cell (i,j) of C requires row i from A and column j from B. The finest grain would be to compute one cell in C. Instead I will compute a row or more of C in each process.
+
+
+
+2. Communication analysis - what communication is required among tasks
+-----------------------------------------------------
+Master sends all of matrix B to all the processes (broadcast).
+Master sends a point to point communications of the appropriate columns of A described above to each process. 
+Workers do a receive on A, and to get their rows of A. Once workers finish computing, they send their rows of C back to master.
+
+
+
+3. Agglomeration - reduce communication
+-----------------------------------------------------
+Wait for all the processes to finish their part of C with a barrier, then send the parts to master. Master receives the appropriate chunks of C and places it at the correct offset.
+
+
+
+4. Mapping - Assign tasks to processors (assume you are targeting a lab machine)
+--------------------------------------------------------
+Process 0 is the master. Process n computes C starting at (pid-1)*numRows/(numProcs-1). So each process computes a fraction of the rows of C, using all of B, and the same rows in A.
+
+For example, with 4 processes and C having 12 rows:
+	Process 0 would be Master
+	Process 1 does rows 0 to 3
+	Process 2 does rows 4-7
+	Process 3 does rows 8-11
+
+
+
