@@ -1,0 +1,37 @@
+Input Format:
+a, 0, 0, 10 (In matrix a, the value at row 0, col 0 is 10.)
+a, 3, 4, 10
+...
+b, 2, 3, 10 (In matrix b, the value at row 2, col 3 is 10.)
+...
+
+
+Hadoop Installation
+
+I downloaded hadoop-2.7.2.tar.gz from http://apache.claz.org/hadoop/common/hadoop-2.7.2/ into /usr/bin. This /usr/bin should be the same folder that you have jar, java, javac. I'm not sure if this matters but it mattered for me. 
+
+Inside of /usr/bin run `tar xzf hadoop-2.7.2.tar.gz`
+Now there should be hadoop-2.7.2 folder in /usr/bin.
+
+Make sure the following environment variables are in your bashrc or bash_profile and added to path:
+export HADOOP_HOME=/usr/bin/hadoop-2.7.2
+export HADOOP_CLASSPATH=$JAVA_HOME/lib/tools.jar
+export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64 (Your path to java home may be different)
+export PATH = $PATH:$HADOOP_HOME/bin
+
+Verify your hadoop installation works by typing `hadoop` into the command like from a folder that is not /usr/bin
+
+To run:
+In the HadoopMatrixMultiplication directory, make sure there is an input folder with lines as shown in the input format.
+
+Remove the output folder if it exists. (Needed if you run more than once).
+
+I have included the jar file in this folder, so the first two commands are unnecesary unles you want to generate the .class and .jar files on your own. With the jar file, you can just run the last command. 
+
+`hadoop com.sun.tools.javac.Main MatrixMultiplyMR.java`
+
+`jar cf mm.jar Matrix*.class`
+
+`hadoop jar mm.jar MatrixMultiplyMR input output`
+
+After running, and seeing the job is successful, cd into the output directory and look at the file that titled something like part-r-00000, that is where the output matrix will be. 

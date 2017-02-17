@@ -1,0 +1,65 @@
+2 Types of Parallel Programming:
+
+Shared Memory- 
+Message Passing- hooking up 2 comps
+
+POSIX threads- posix is an API determining how threads can be used. 
+
+Program 
+   V
+Process
+v v v v
+T T T T --> shares state with process it comes from
+		--> has own memory
+
+Fork & execute: Fork is a system call that duplicates processes
+Program
+   V
+process > process
+
+OS determines what threads do 
+
+
+gcc -lpthread pthreadhello.c pth
+./pth
+
+
+
+RACE CONDITION -> whether A or B gets executed in which lines
+--------------------------------------------------------------
+Thread A
+-----------
+A1 R0 = counter
+A2 R0 = R0+1
+A3 counter = R0
+
+
+Thread B
+-----------
+B1 R1 = counter
+B2 R1 = R1+1
+B3 counter = R1
+
+counter at start = 17
+OS executes --> A1 A2 B1 A3 B2 B3
+
+Counter: 17 18
+R0:      18
+R1:      17 18
+
+Counter should have been 19, but not. 
+
+Solution -> make counter ++ atomic (A1 thru A3 needs to happen together) CRITICAL SECTION
+--------------------------------------------------------------
+-n threads competing for shared data
+-when 1 thread in its critical section, no other may b
+-a 1 way bridge for instance. 
+
+1. Mutual Exclusion (one at a time)
+	use semaphore/mutex--> semaphore is a signaling system
+	we will signal that someone is in the critical section!
+	extra piece of shared data
+	if you call init, call destroy
+	
+2. Progress (no unnecessary waiting)
+3. Bounded Waiting (no starvation)

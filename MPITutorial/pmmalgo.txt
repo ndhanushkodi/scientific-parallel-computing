@@ -1,0 +1,43 @@
+init vars
+int *a, *b, *c;
+if(master)
+	a = malloc 
+	b= all space
+	c= all space
+else
+	a= malloc
+	b = malloc column
+	c= malloc column
+
+comm
+---------
+if(master)
+	init matrix
+	print A, print B;
+	these sends can be unblocked
+	send A to everyone
+	send chunk of B to everyone
+else
+	receive 2 things from master
+
+comp
+----------
+if(!master)
+	do computations for my part of c
+	build my c
+
+barrier
+----------
+all procs need to catch up this
+
+print
+----------
+if not master, send with blocking your part of c to master
+
+if master receive with blocking
+	print matrix
+
+cleanup
+--------
+free
+each process will do its own freeing

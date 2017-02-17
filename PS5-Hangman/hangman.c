@@ -4,7 +4,19 @@
 #include <time.h>
 #define DICT_CONTENT_SIZE 100000
 #define GUESS_SIZE 3 //plus buffer space
-#define ALPHA_SIZE 100 //so commas plus all lowercase letters
+#define ALPHA_SIZE 100 //commas plus all lowercase letters to hold misses
+
+/***********************************************************************
+
+	THE GAME OF HANGMAN:
+	To run:
+		make hangman
+		./hangman dictionary.txt (dictionary should be a tab-delimited text file)
+
+	To play:
+		make guesses before the gallows are printed
+
+***********************************************************************/
 
 /*****************************************
 STRUCT DECLARATIONS
